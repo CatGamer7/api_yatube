@@ -10,14 +10,15 @@ class BaseAuthority(viewsets.ModelViewSet):
     def perform_destroy(self, instance):
         if instance.author != self.request.user:
             raise PermissionDenied('Изменение чужого контента запрещено!')
-        
+
         return super().perform_destroy(instance)
-    
+
     def perform_update(self, serializer):
         if serializer.instance.author != self.request.user:
             raise PermissionDenied('Изменение чужого контента запрещено!')
-        
+
         return super().perform_update(serializer)
+
 
 class GroupViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Group.objects.all()
@@ -33,13 +34,14 @@ class PostViewSet(BaseAuthority):
             author=self.request.user
         )
 
+
 class CommentViewSet(BaseAuthority):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
 
     def get_queryset(self):
         return self.get_post_obj().comments.all()
-    
+
     def get_post_obj(self):
         return get_object_or_404(
             Post,
